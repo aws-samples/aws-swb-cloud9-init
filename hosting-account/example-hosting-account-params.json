@@ -1,0 +1,38 @@
+[
+  {
+    "ParameterKey": "Namespace",
+    "ParameterValue": "CFN_PARAM_StageName"
+  },
+  {
+    "ParameterKey": "CentralAccountId",
+    "ParameterValue": "CFN_PARAM_CentralAccountId"
+  },
+  {
+    "ParameterKey": "ApiHandlerRoleArn",
+    "ParameterValue": "CFN_PARAM_ApiHandlerRoleArn"
+  },
+  {
+    "ParameterKey": "WorkflowLoopRunnerRoleArn",
+    "ParameterValue": "CFN_PARAM_WorkflowLoopRunnerRoleArn"
+  },  
+  {
+    "ParameterKey": "ExternalId",
+    "ParameterValue": "workbench"
+  },  
+  {
+    "ParameterKey": "VpcCidr",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "VpcPublicSubnet1Cidr",
+    "ParameterValue": "10.0.0.0/19"
+  },
+  {
+    "ParameterKey": "LaunchConstraintPolicyPrefix",
+    "ParameterValue": "*"
+  },
+  {
+    "ParameterKey": "LaunchConstraintRolePrefix",
+    "ParameterValue": "*"
+  }
+]
