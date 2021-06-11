@@ -8,7 +8,8 @@ echo "Preparing your environment ..."
 # Check for AWS Region --------------------------
 if [ -z "$AWS_REGION" ]
 then
-    printf "------ERROR: $AWS_REGION environment variable is not set, aborting -------------\n"
+    # echo "------ERROR: AWS_REGION environment variable is not set, aborting -------------\n"
+    exit 0
 fi
 
 # Export Default Env Variables ------------------
