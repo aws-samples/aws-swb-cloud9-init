@@ -2,7 +2,6 @@
 
 # -----------------------------------------------
 cwd=$(pwd)
-cd ~/environment
 echo "-------------------------------------------------------------------------"
 echo "Preparing your environment ..."
 
@@ -23,7 +22,9 @@ export PACKER_VER=1.7.2
 
 # Clone SWB and install dependencies ------------
 echo "Cloning SWB Repo ..."
+cd ~/environment
 git clone --depth 1 --branch $SWB_VER https://github.com/awslabs/service-workbench-on-aws.git >/dev/null 2>&1
+cd $cwd
 echo "Installing dependencies ..."
 sudo yum install jq -y -q -e 0 >/dev/null 2>&1
 echo "Enabling utilities scripts ..."
@@ -33,7 +34,6 @@ echo "Resizing AWS Cloud9 Volume ..."
 ./cloud9-resize.sh #50GB by default
 
 # NVM & Node Versions ---------------------------
-cd $cwd
 echo "Installing nvm ..."
 rm -rf ~/.nvm
 export NVM_DIR=
