@@ -45,7 +45,7 @@ nvm alias default stable
 
 # npm packages ----------------------------------
 echo "Installing framework and libs ..."
-npm install -g serverless pnpm hygen yarn docusaurus serverless pnpm hygen >/dev/null 2>&1
+npm install -g serverless pnpm hygen yarn docusaurus >/dev/null 2>&1
 
 # packer ----------------------------------------
 echo "Installing packer ..."
