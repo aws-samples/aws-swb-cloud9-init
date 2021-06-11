@@ -27,8 +27,8 @@ then
         
         
         echo ">> 2/4 - Preparing CFn Args"
-        CFN_FILE_PARAM=~/environment/cloud9/hosting-account-cfn-args-$STAGE_NAME.json
-        cp ~/environment/cloud9/example-hosting-account-params.json $CFN_FILE_PARAM
+        CFN_FILE_PARAM=~/environment/cloud9-tools/hosting-account-cfn-args-$STAGE_NAME.json
+        cp ~/environment/cloud9-tools/example-hosting-account-params.json $CFN_FILE_PARAM
         
         # Namespace
         sed -i "s/CFN_PARAM_StageName/$STAGE_NAME/g" $CFN_FILE_PARAM
@@ -76,4 +76,4 @@ else
 fi
 
 # getting back to the working dir
-cd $cwd
+cd $cwd 
