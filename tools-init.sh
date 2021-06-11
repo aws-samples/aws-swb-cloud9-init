@@ -6,9 +6,10 @@ echo "-------------------------------------------------------------------------"
 echo "Preparing your environment ..."
 
 # Check for AWS Region --------------------------
+export AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
 if [ -z "$AWS_REGION" ]
 then
-    # echo "------ERROR: AWS_REGION environment variable is not set, aborting -------------\n"
+    # metadata might err, this is a safeguard
     exit 0
 fi
 
