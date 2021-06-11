@@ -22,8 +22,8 @@ then
         # then sourced
         echo ">> 1/4 - Copying Loading Env Vars"
         cd ~/environment/service-workbench-on-aws/main/solution/backend
-        aws cloudformation describe-stacks --stack-name $(pnpx sls info --verbose --stage $STAGE_NAME | grep 'stack: ' | sed 's/stack\: //g') | jq '.Stacks[].Outputs[] | {ParameterKey: .OutputKey, ParameterValue: .OutputValue} | select(.OutputKey != "ServiceEndpoint")  | flatten | "export CFN_PARAM_\(.[0])=\(.[1])"' | sed "s/\"//g; s/\=/\=\"/g; s/$/\";/" > ~/environment/cloud9/hosting-account-env-vars;
-        source ~/environment/cloud9/hosting-account-env-vars
+        aws cloudformation describe-stacks --stack-name $(pnpx sls info --verbose --stage $STAGE_NAME | grep 'stack: ' | sed 's/stack\: //g') | jq '.Stacks[].Outputs[] | {ParameterKey: .OutputKey, ParameterValue: .OutputValue} | select(.OutputKey != "ServiceEndpoint")  | flatten | "export CFN_PARAM_\(.[0])=\(.[1])"' | sed "s/\"//g; s/\=/\=\"/g; s/$/\";/" > ~/environment/cloud9-tools/hosting-account-env-vars;
+        source ~/environment/cloud9-tools/hosting-account-env-vars
         
         
         echo ">> 2/4 - Preparing CFn Args"
