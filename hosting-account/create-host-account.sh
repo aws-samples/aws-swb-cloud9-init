@@ -1,15 +1,15 @@
 #!/bin/bash
 set -e
-​
+
 echo "-------------------------------------------------------------------------"
 echo "Hosting Account Setup"
 echo "-------------------------------------------------------------------------"
-​
+
 # doing this at ~
 cwd=$(pwd)
 HOSTINGACCOUNT_ARG=${1}
 HOSTINGACCOUNT_ARG_LENGTH=${#1}
-​
+
 if [[ "$HOSTINGACCOUNT_ARG_LENGTH" == "12" ]] 
 then
     if [ -z "$STAGE_NAME" ]
@@ -74,6 +74,6 @@ then
 else
     echo "------ERROR: Argument ACCOUNT_ID should have 12 digits-------------\n"
 fi
-​
+
 # getting back to the working dir
 cd $cwd 
