@@ -46,7 +46,7 @@ then
         sed -i "s|WorkflowLoopRunnerRoleArn|WorkflowRoleArn|g" $CFN_FILE_PARAM
         
         
-        STACK_NAME=aws-hosting-account-$HOSTINGACCOUNT_ARG-stack
+        STACK_NAME=swb-hosting-compute-$HOSTINGACCOUNT_ARG-$STAGE_NAME-stack
         echo ">> 3/4 - Creating stack: ${STACK_NAME}"
         STACK_ID=$(aws cloudformation create-stack \
             --stack-name $STACK_NAME \
