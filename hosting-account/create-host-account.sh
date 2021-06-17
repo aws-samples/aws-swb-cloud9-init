@@ -1,15 +1,15 @@
 #!/bin/bash
 set -e
-
+​
 echo "-------------------------------------------------------------------------"
 echo "Hosting Account Setup"
 echo "-------------------------------------------------------------------------"
-
+​
 # doing this at ~
 cwd=$(pwd)
 HOSTINGACCOUNT_ARG=${1}
 HOSTINGACCOUNT_ARG_LENGTH=${#1}
-
+​
 if [[ "$HOSTINGACCOUNT_ARG_LENGTH" == "12" ]] 
 then
     if [ -z "$STAGE_NAME" ]
@@ -22,13 +22,13 @@ then
         # then sourced
         echo ">> 1/4 - Copying Loading Env Vars"
         cd ~/environment/service-workbench-on-aws/main/solution/backend
-        aws cloudformation describe-stacks --stack-name $(pnpx sls info --verbose --stage $STAGE_NAME | grep 'stack: ' | sed 's/stack\: //g') | jq '.Stacks[].Outputs[] | {ParameterKey: .OutputKey, ParameterValue: .OutputValue} | select(.OutputKey != "ServiceEndpoint")  | flatten | "export CFN_PARAM_\(.[0])=\(.[1])"' | sed "s/\"//g; s/\=/\=\"/g; s/$/\";/" > ~/environment/cloud9-tools/hosting-account-env-vars;
-        source ~/environment/cloud9-tools/hosting-account-env-vars
+        aws cloudformation describe-stacks --stack-name $(pnpx sls info --verbose --stage $STAGE_NAME | grep 'stack: ' | sed 's/stack\: //g') | jq '.Stacks[].Outputs[] | {ParameterKey: .OutputKey, ParameterValue: .OutputValue} | select(.OutputKey != "ServiceEndpoint")  | flatten | "export CFN_PARAM_\(.[0])=\(.[1])"' | sed "s/\"//g; s/\=/\=\"/g; s/$/\";/" > ~/environment/aws-swb-cloud9-init/hosting-account-env-vars;
+        source ~/environment/aws-swb-cloud9-init/hosting-account-env-vars
         
         
         echo ">> 2/4 - Preparing CFn Args"
-        CFN_FILE_PARAM=~/environment/cloud9-tools/hosting-account-cfn-args-$STAGE_NAME.json
-        cp ~/environment/cloud9-tools/example-hosting-account-params.json $CFN_FILE_PARAM
+        CFN_FILE_PARAM=~/environment/aws-swb-cloud9-init/hosting-account-cfn-args-$STAGE_NAME.json
+        cp ~/environment/aws-swb-cloud9-init/hosting-account/example-hosting-account-params.json $CFN_FILE_PARAM
         
         # Namespace
         sed -i "s/CFN_PARAM_StageName/$STAGE_NAME/g" $CFN_FILE_PARAM
@@ -74,6 +74,6 @@ then
 else
     echo "------ERROR: Argument ACCOUNT_ID should have 12 digits-------------\n"
 fi
-
+​
 # getting back to the working dir
 cd $cwd 
