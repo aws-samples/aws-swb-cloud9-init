@@ -29,7 +29,7 @@ cd ~/environment
 git clone https://github.com/awslabs/service-workbench-on-aws.git >/dev/null 2>&1
 cd $cwd
 echo "Installing dependencies ..."
-sudo yum install jq -y -q -e 0 >/dev/null 2>&1
+sudo yum install golang jq -y -q -e 0 >/dev/null 2>&1
 echo "Enabling utilities scripts ..."
 chmod +x cloud9-resize.sh
 chmod +x hosting-account/create-host-account.sh
