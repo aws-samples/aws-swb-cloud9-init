@@ -41,16 +41,16 @@ if [ -d $SWB_DIR ]; then
 else
     echo "Cloning SWB Repo ${SWB_VER} from GitHub into ~/environment"
     cd ~/environment
-    git clone https://github.com/awslabs/service-workbench-on-aws.git >/dev/null 2>&1
+    git clone https://github.com/awslabs/service-workbench-on-aws.git &>/dev/null
 fi
 cd $cwd
 
 DEPENDENCIES=(golang jq)
 # echo "Installing dependencies ${DEPENDENCIES} ..."
 for dependency in ${DEPENDENCIES[@]}; do
-    if $(! yum list installed $dependency > /dev/null 2>&1); then
+    if $(! yum list installed $dependency &> /dev/null); then
 	echo "Installing dependency: $dependency"
-	sudo yum install $dependency -y -q -e 0 >/dev/null 2>&1
+	sudo yum install $dependency -y -q -e 0 &> /dev/null
     else
 	echo "Dependency is installed: $dependency"
     fi
@@ -75,18 +75,20 @@ if ! nvm --version &> /dev/null; then
     rm -rf ~/.nvm
     export NVM_DIR=
     curl --silent -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VER/install.sh" | bash
-    source ~/.nvm/nvm.sh
+    source ~/.nvm/nvm.sh &> /dev/null
 else
-    echo "nvm version $(nvm -v) is installed"
+    nvm_ver=$(nvm --version)
+    echo "nvm version ${nvm_ver} is installed"
 fi
 
 LTS_VER=$(nvm version-remote --lts)
 nvm use ${LTS_VER} &> /dev/null
 if (($? != 0)); then
     echo "Installing node version ${LTS_VER}"
-    nvm install --lts
+    nvm install --lts &> /dev/null
 fi
-nvm alias default stable &> /dev/null
+nvm alias default $LTS_VER &> /dev/null
+echo "Using node version:" $(node --version)
 
 # npm packages ----------------------------------
 NPM_PACKAGES=(serverless pnpm hygen yarn docusaurus)
@@ -102,7 +104,7 @@ for package in ${NPM_PACKAGES[@]}; do
 done
 
 # packer ----------------------------------------
-packer --version &> /dev/null
+/usr/local/bin/packer --version &> /dev/null
 if (($? != 0)); then
     echo "Installing packer ${PACKER_VER} into /usr/local/bin/ ..."
     wget -q "https://releases.hashicorp.com/packer/$PACKER_VER/packer_${PACKER_VER}_linux_amd64.zip" -O packer_${PACKER_VER}_linux_amd64.zip
