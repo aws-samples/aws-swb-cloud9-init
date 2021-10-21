@@ -35,6 +35,9 @@ if [ -d $SWB_DIR ]; then
     cd $SWB_DIR
     CURRENT_VER=$(git describe --tags --abbrev=0)
     echo "SWB code ${CURRENT_VER} already installed"
+    if [ ! $CURRENT_VER == $SWB_VER ]; then
+	echo "NOTE: Current latest version is $SWB_VER; `git pull` to update"
+    fi
 else
     echo "Cloning SWB Repo ${SWB_VER} from GitHub into ~/environment"
     cd ~/environment
@@ -49,7 +52,7 @@ for dependency in ${DEPENDENCIES[@]}; do
 	echo "Installing dependency: $dependency"
 	sudo yum install $dependency -y -q -e 0 >/dev/null 2>&1
     else
-	echo "Dependency $dependency exists"
+	echo "Dependency is installed: $dependency"
     fi
 done
 
@@ -66,9 +69,8 @@ else
 fi
 
 # NVM & Node Versions ---------------------------
-# LTS_VER=$(nvm version-remote --lts)
-source ~/.nvm/nvm.sh
-if ! nvm --version > /dev/null 2>&1; then
+source ~/.nvm/nvm.sh &> /dev/null
+if ! nvm --version &> /dev/null; then
     echo "Installing nvm ${NVM_VER} ..."
     rm -rf ~/.nvm
     export NVM_DIR=
@@ -77,33 +79,46 @@ if ! nvm --version > /dev/null 2>&1; then
 else
     echo "nvm version $(nvm -v) is installed"
 fi
-exit
 
-nvm install --lts
-nvm use --lts
-nvm alias default stable
-node --version
-echo "Exiting, check node version"
-exit
+LTS_VER=$(nvm version-remote --lts)
+nvm use ${LTS_VER} &> /dev/null
+if (($? != 0)); then
+    echo "Installing node version ${LTS_VER}"
+    nvm install --lts
+fi
+nvm alias default stable &> /dev/null
 
 # npm packages ----------------------------------
 NPM_PACKAGES=(serverless pnpm hygen yarn docusaurus)
-echo "Installing framework and libs ..."
-npm install -g $NPM_PACKAGES >/dev/null 2>&1
+NPM_INSTALLED=$(npm ls -g --depth=0)
+for package in ${NPM_PACKAGES[@]}; do
+    echo $NPM_INSTALLED | grep $package &>/dev/null
+    if (($? != 0)); then
+	echo "Installing npm package ${package}"
+	npm install -g $package &> /dev/null
+    else
+	echo "npm package is installed: ${package}"
+    fi
+done
 
 # packer ----------------------------------------
-echo "Installing packer ${PACKER_VER} into /usr/local/bin/ ..."
-wget -q "https://releases.hashicorp.com/packer/$PACKER_VER/packer_${PACKER_VER}_linux_amd64.zip" -O packer_${PACKER_VER}_linux_amd64.zip
-unzip "packer_${PACKER_VER}_linux_amd64.zip" >/dev/null 2>&1
-sudo mv packer /usr/local/bin/ >/dev/null 2>&1
-rm -f "packer_${PACKER_VER}_linux_amd64.zip" >/dev/null 2>&1
-
-echo "Exiting"
-exit
+packer --version &> /dev/null
+if (($? != 0)); then
+    echo "Installing packer ${PACKER_VER} into /usr/local/bin/ ..."
+    wget -q "https://releases.hashicorp.com/packer/$PACKER_VER/packer_${PACKER_VER}_linux_amd64.zip" -O packer_${PACKER_VER}_linux_amd64.zip
+    unzip "packer_${PACKER_VER}_linux_amd64.zip" >/dev/null 2>&1
+    sudo mv packer /usr/local/bin/ >/dev/null 2>&1
+    rm -f "packer_${PACKER_VER}_linux_amd64.zip" >/dev/null 2>&1
+else
+    echo "Packer application is installed"
+fi
 
 # finishing up ----------------------------------
 echo "Finishing up ..."
-echo -e "alias swb-ami-list='aws ec2 describe-images --owners self --query \"reverse(sort_by(Images[*].{Id:ImageId,Name:Name, Created:CreationDate}, &Created))\" --filters \"Name=name,Values=${STAGE_NAME}*\" --output table'" >> ~/.bashrc 
+if ! grep -q 'alias swb-ami-list' ~/.bashrc; then
+    echo -e "alias swb-ami-list='aws ec2 describe-images --owners self --query \"reverse(sort_by(Images[*].{Id:ImageId,Name:Name, Created:CreationDate}, &Created))\" --filters \"Name=name,Values=${STAGE_NAME}*\" --output table'" >> ~/.bashrc
+fi
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" 
