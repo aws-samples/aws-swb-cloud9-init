@@ -5,6 +5,17 @@ cwd=$(pwd)
 echo "-------------------------------------------------------------------------"
 echo "Preparing your environment ..."
 
+DEPENDENCIES=(golang jq)
+# echo "Installing dependencies ${DEPENDENCIES} ..."
+for dependency in ${DEPENDENCIES[@]}; do
+    if $(! yum list installed $dependency &> /dev/null); then
+	    echo "Installing dependency: $dependency"
+	    sudo yum install $dependency -y -q -e 0 &> /dev/null
+    else
+	    echo "Dependency is installed: $dependency"
+    fi
+done
+
 # Check for AWS Region --------------------------
 export AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
 if [ -z "$AWS_REGION" ]
@@ -26,7 +37,7 @@ aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 
 export NVM_VER=$(curl --silent "https://github.com/nvm-sh/nvm/releases/latest" | sed 's#.*tag/\(.*\)\".*#\1#') #v.0.38.0
-export SWB_VER=$(curl --silent "https://github.com/awslabs/service-workbench-on-aws/releases/latest" | sed 's#.*tag/\(.*\)\".*#\1#') #v.3.1.0
+export SWB_VER=$(curl --silent https://api.github.com/repos/awslabs/service-workbench-on-aws/releases/latest | jq -r .tag_name) #v.5.2.7
 export PACKER_VER=1.7.2
 
 # Ensure SWB code exists.  Assume it's the latest version. ------------
@@ -34,9 +45,9 @@ SWB_DIR=~/environment/service-workbench-on-aws
 if [ -d $SWB_DIR ]; then
     cd $SWB_DIR
     CURRENT_VER=$(git describe --tags --abbrev=0)
-    echo "SWB code ${CURRENT_VER} already installed"
+    echo "SWB code ${CURRENT_VER} is currently installed"
     if [ ! $CURRENT_VER == $SWB_VER ]; then
-	echo "NOTE: Current latest version is $SWB_VER; `git pull` to update"
+	    echo "NOTE: Current latest version is $SWB_VER; `git pull` to update"
     fi
 else
     echo "Cloning SWB Repo ${SWB_VER} from GitHub into ~/environment"
@@ -44,17 +55,6 @@ else
     git clone https://github.com/awslabs/service-workbench-on-aws.git &>/dev/null
 fi
 cd $cwd
-
-DEPENDENCIES=(golang jq)
-# echo "Installing dependencies ${DEPENDENCIES} ..."
-for dependency in ${DEPENDENCIES[@]}; do
-    if $(! yum list installed $dependency &> /dev/null); then
-	echo "Installing dependency: $dependency"
-	sudo yum install $dependency -y -q -e 0 &> /dev/null
-    else
-	echo "Dependency is installed: $dependency"
-    fi
-done
 
 echo "Enabling utilities scripts ..."
 chmod +x cloud9-resize.sh
@@ -81,7 +81,8 @@ else
     echo "nvm version ${nvm_ver} is installed"
 fi
 
-LTS_VER=$(nvm version-remote --lts)
+# LTS_VER=$(nvm version-remote --lts)
+LTS_VER=v16
 nvm use ${LTS_VER} &> /dev/null
 if (($? != 0)); then
     echo "Installing node version ${LTS_VER}"
@@ -96,10 +97,14 @@ NPM_INSTALLED=$(npm ls -g --depth=0)
 for package in ${NPM_PACKAGES[@]}; do
     echo $NPM_INSTALLED | grep $package &>/dev/null
     if (($? != 0)); then
-	echo "Installing npm package ${package}"
-	npm install -g $package &> /dev/null
+	    echo "Installing npm package ${package}"
+	    npm install -g $package &> /dev/null
+	    if (($? != 0)); then
+	        echo "ERROR installing npm package ${package} using Node version ${LTS_VER}; exiting"
+	        exit
+	    fi
     else
-	echo "npm package is installed: ${package}"
+	    echo "npm package is installed: ${package}"
     fi
 done
 
