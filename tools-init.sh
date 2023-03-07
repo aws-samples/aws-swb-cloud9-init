@@ -81,9 +81,11 @@ else
     echo "nvm version ${nvm_ver} is installed"
 fi
 
+
 # LTS_VER=$(nvm version-remote --lts)
 LTS_VER=v16
 nvm use ${LTS_VER} &> /dev/null
+
 if (($? != 0)); then
     echo "Installing node version ${LTS_VER}"
     nvm install --lts &> /dev/null
