@@ -36,7 +36,7 @@ fi
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 
-export NVM_VER=$(curl --silent "https://github.com/nvm-sh/nvm/releases/latest" | sed 's#.*tag/\(.*\)\".*#\1#') #v.0.38.0
+export NVM_VER=$(curl --silent https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r .tag_name) #v.0.39.3
 export SWB_VER=$(curl --silent https://api.github.com/repos/awslabs/service-workbench-on-aws/releases/latest | jq -r .tag_name) #v.5.2.7
 export PACKER_VER=1.7.2
 
